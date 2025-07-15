@@ -268,10 +268,6 @@ export async function Unity(unityVersion: UnityVersion, architecture: string, mo
         architecture = 'x86_64';
     }
     if (!unityVersion.changeset && !unityVersion.isLegacy()) {
-        core.info(`Fetching latest release for Unity ${unityVersion.toString()}...`);
-        unityVersion = await getLatestRelease(unityVersion.version, architecture === 'arm64');
-    }
-    if (!unityVersion.changeset && !unityVersion.isLegacy()) {
         core.info(`Fetching changeset for Unity ${unityVersion.toString()}...`);
         unityVersion = await getChangeset(unityVersion);
     }
