@@ -8,10 +8,17 @@ echo "deb https://archive.ubuntu.com/ubuntu jammy main universe" | sudo tee /etc
 sudo apt-get update
 sudo apt-get install -y --no-install-recommends unityhub ffmpeg libgtk2.0-0 libglu1-mesa libgconf-2-4 libncurses5
 sudo apt-get clean
-# Unity 2019.x/2020.x
+
+# Unity 2019.{3,4}/2020.x
 curl -LO https://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
 sudo dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
 rm libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+
+# Unity 2019.{1,2}
+curl -LO https://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.0.0_1.0.2g-1ubuntu4.20_amd64.deb
+sudo dpkg -i libssl1.0.0_1.0.2g-1ubuntu4.20_amd64.deb
+rm libssl1.0.0_1.0.2g-1ubuntu4.20_amd64.deb
+
 sudo sed -i 's/^\(.*DISPLAY=:.*XAUTHORITY=.*\)\( "\$@" \)2>&1$/\1\2/' /usr/bin/xvfb-run
 sudo printf '#!/bin/bash\nxvfb-run --auto-servernum /opt/unityhub/unityhub "$@" 2>/dev/null' | sudo tee /usr/bin/unity-hub >/dev/null
 sudo chmod 777 /usr/bin/unity-hub
