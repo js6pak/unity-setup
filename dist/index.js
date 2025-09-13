@@ -35894,35 +35894,40 @@ function init() {
     }
 }
 async function Get() {
+    let alreadyInstalled;
     try {
         await fs.promises.access(hubPath, fs.constants.X_OK);
+        alreadyInstalled = true;
     }
     catch (error) {
         hubPath = await installUnityHub();
+        alreadyInstalled = false;
     }
     const hubVersion = await getInstalledHubVersion();
     if (!semver.valid(hubVersion)) {
         throw new Error(`Failed to get installed Unity Hub version ${hubVersion}!`);
     }
     core.info(`Unity Hub Version:\n  > ${hubVersion}`);
-    const latestHubVersion = await getLatestHubVersion();
-    if (!semver.valid(latestHubVersion)) {
-        throw new Error(`Failed to get latest Unity Hub version!`);
-    }
-    core.debug(`Latest Unity Hub Version:\n  > ${latestHubVersion}`);
-    core.debug(`Comparing versions:\n  > ${hubVersion} < ${latestHubVersion} => ${semver.compare(hubVersion, latestHubVersion)}`);
-    if (semver.compare(hubVersion, latestHubVersion) < 0) {
-        core.info(`Installing Latest Unity Hub Version:\n  > ${latestHubVersion}`);
-        if (process.platform !== 'linux') {
-            core.info(`Removing previous Unity Hub version:\n  > ${hubVersion}`);
-            await (0, utility_1.RemovePath)(hubPath);
-            hubPath = await installUnityHub();
+    if (alreadyInstalled) {
+        const latestHubVersion = await getLatestHubVersion();
+        if (!semver.valid(latestHubVersion)) {
+            throw new Error(`Failed to get latest Unity Hub version!`);
         }
-        else {
-            const scriptPath = __nccwpck_require__.ab + "update-unityhub-linux.sh";
-            const exitCode = await exec.exec('sh', [__nccwpck_require__.ab + "update-unityhub-linux.sh"]);
-            if (exitCode !== 0) {
-                throw new Error(`Failed to install Unity Hub: ${exitCode}`);
+        core.debug(`Latest Unity Hub Version:\n  > ${latestHubVersion}`);
+        core.debug(`Comparing versions:\n  > ${hubVersion} < ${latestHubVersion} => ${semver.compare(hubVersion, latestHubVersion)}`);
+        if (semver.compare(hubVersion, latestHubVersion) < 0) {
+            core.info(`Installing Latest Unity Hub Version:\n  > ${latestHubVersion}`);
+            if (process.platform !== 'linux') {
+                core.info(`Removing previous Unity Hub version:\n  > ${hubVersion}`);
+                await (0, utility_1.RemovePath)(hubPath);
+                hubPath = await installUnityHub();
+            }
+            else {
+                const scriptPath = __nccwpck_require__.ab + "update-unityhub-linux.sh";
+                const exitCode = await exec.exec('sh', [__nccwpck_require__.ab + "update-unityhub-linux.sh"]);
+                if (exitCode !== 0) {
+                    throw new Error(`Failed to install Unity Hub: ${exitCode}`);
+                }
             }
         }
     }
